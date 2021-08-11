@@ -195,9 +195,27 @@ func SenderVms() (err error) {
 	vmDirJson, _ := json.Marshal(vmList)
 	metrics = append(metrics, NewMetric("VMP", "vmp.vms", fmt.Sprintf("%s", vmDirJson)))
 
+	var iops_write_count int64
+	var iops_read_count int64
+	var disk_info_speed_read_count int64
+	var disk_info_speed_write_count int64
+	var flow_info_send_count int64
+	var flow_info_receive_count int64
+	var flow_info_send_package_count int64
+	var flow_info_receive_package_count int64
+
 	// add vm info
 	for i := 0; i < len(vmsInfo.Data); i++ {
 		zabbixHostName := strconv.FormatInt(vmsInfo.Data[i].Vmid, 10)
+
+		iops_write_count = iops_write_count + vmsInfo.Data[i].DiskInfoIopsWrite
+		iops_read_count = iops_read_count + vmsInfo.Data[i].DiskInfoIopsRead
+		disk_info_speed_read_count = disk_info_speed_read_count + vmsInfo.Data[i].DiskInfoSpeedRead
+		disk_info_speed_write_count = disk_info_speed_write_count + vmsInfo.Data[i].DiskInfoSpeedWrite
+		flow_info_send_count = flow_info_send_count + vmsInfo.Data[i].FlowInfoSend
+		flow_info_receive_count = flow_info_receive_count + vmsInfo.Data[i].FlowInfoReceive
+		flow_info_send_package_count = flow_info_send_package_count + vmsInfo.Data[i].FlowInfoSendPackage
+		flow_info_receive_package_count = flow_info_receive_package_count + vmsInfo.Data[i].FlowInfoReceivePackage
 
 		metrics = append(metrics, NewMetric(zabbixHostName, "name", vmsInfo.Data[i].Name))
 		metrics = append(metrics, NewMetric(zabbixHostName, "vmid", strconv.FormatInt(vmsInfo.Data[i].Vmid, 10)))
@@ -232,12 +250,22 @@ func SenderVms() (err error) {
 		metrics = append(metrics, NewMetric(zabbixHostName, "flow_info_send_package", strconv.FormatInt(vmsInfo.Data[i].FlowInfoSendPackage, 10)))
 		metrics = append(metrics, NewMetric(zabbixHostName, "flow_info_receive_package", strconv.FormatInt(vmsInfo.Data[i].FlowInfoReceivePackage, 10)))
 
-		metrics = append(metrics, NewMetric(zabbixHostName, "backup_info_backuptime", strconv.Itoa(vmsInfo.Data[i].BackupInfoBackuptime)))
+		metrics = append(metrics, NewMetric(zabbixHostName, "backup_info_backuptime", JsonRatioStr(vmsInfo.Data[i].BackupInfoBackuptime)))
 		metrics = append(metrics, NewMetric(zabbixHostName, "backup_info_enable", strconv.Itoa(vmsInfo.Data[i].BackupInfoEnable)))
 
 		metrics = append(metrics, NewMetric(zabbixHostName, "vmid", strconv.Itoa(int(vmsInfo.Data[i].Vmid))))
 		metrics = append(metrics, NewMetric(zabbixHostName, "ip", vmsInfo.Data[i].IP))
 	}
+
+	metrics = append(metrics, NewMetric("VMP", "vmp.vms.disk.iops.read.count", fmt.Sprintf("%d", iops_read_count)))
+	metrics = append(metrics, NewMetric("VMP", "vmp.vms.disk.iops.write.count", fmt.Sprintf("%d", iops_write_count)))
+
+	metrics = append(metrics, NewMetric("VMP", "vmp.vms.disk.speed.read.count", fmt.Sprintf("%d", disk_info_speed_read_count)))
+	metrics = append(metrics, NewMetric("VMP", "vmp.vms.disk.speed.write.count", fmt.Sprintf("%d", disk_info_speed_write_count)))
+	metrics = append(metrics, NewMetric("VMP", "vmp.vms.flow.send.count", fmt.Sprintf("%d", flow_info_send_count)))
+	metrics = append(metrics, NewMetric("VMP", "vmp.vms.flow.receive.count", fmt.Sprintf("%d", flow_info_receive_count)))
+	metrics = append(metrics, NewMetric("VMP", "vmp.vms.flow.send.package.count", fmt.Sprintf("%d", flow_info_send_package_count)))
+	metrics = append(metrics, NewMetric("VMP", "vmp.vms.flow.receive.package.count", fmt.Sprintf("%d", flow_info_receive_package_count)))
 
 	// Create instance of Packet class
 	packet := NewPacket(metrics)
@@ -364,10 +392,10 @@ type VmsInfo struct {
 		Volatile     string      `json:"volatile,omitempty"`
 		PlanTime     interface{} `json:"plan_time,omitempty"`
 
-		BackupInfoBackuptime int    `json:"backup_info_backuptime,omitempty"`
-		BackupInfoStorage    string `json:"backup_info_storage,omitempty"`
-		BackupInfoEnable     int    `json:"backup_info_enable,omitempty"`
-		BackupInfoBackupsize string `json:"backup_info_backupsize,omitempty"`
+		BackupInfoBackuptime interface{} `json:"backup_info_backuptime,omitempty"`
+		BackupInfoStorage    string      `json:"backup_info_storage,omitempty"`
+		BackupInfoEnable     int         `json:"backup_info_enable,omitempty"`
+		BackupInfoBackupsize string      `json:"backup_info_backupsize,omitempty"`
 	} `json:"data"`
 }
 

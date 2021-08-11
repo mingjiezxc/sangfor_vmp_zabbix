@@ -1,6 +1,6 @@
 zabbix_export:
   version: '5.4'
-  date: '2021-08-06T03:05:04Z'
+  date: '2021-08-11T06:27:36Z'
   groups:
     -
       uuid: 3f75568136d6468f9aabf5d74978412c
@@ -13,6 +13,55 @@ zabbix_export:
       groups:
         -
           name: VMP
+      items:
+        -
+          uuid: a7b7e4e18dab413ebc2753500c589c58
+          name: 'all vm iops read count'
+          type: TRAP
+          key: vmp.vms.disk.iops.read.count
+          delay: '0'
+        -
+          uuid: 1011628f283e459aa1e42d23d6e6790b
+          name: 'all vm iops write count'
+          type: TRAP
+          key: vmp.vms.disk.iops.write.count
+          delay: '0'
+        -
+          uuid: 8051ef0b0d34421a93435341ffe8bdd9
+          name: 'all vm disk speed read count'
+          type: TRAP
+          key: vmp.vms.disk.speed.read.count
+          delay: '0'
+        -
+          uuid: 0e548befd74443c2bc03fd660d9a88c7
+          name: 'all vm disk speed write count'
+          type: TRAP
+          key: vmp.vms.disk.speed.write.count
+          delay: '0'
+        -
+          uuid: 4e12db15741b4e66a9bca17c4fad8be4
+          name: 'all vm network receive count'
+          type: TRAP
+          key: vmp.vms.flow.receive.count
+          delay: '0'
+        -
+          uuid: 85a9ac47f703422db3a43d473e5dd2b9
+          name: 'all vm network receive package count'
+          type: TRAP
+          key: vmp.vms.flow.receive.package.count
+          delay: '0'
+        -
+          uuid: aaeda93e3bcd4258954f696c67d6939c
+          name: 'all vm network send count'
+          type: TRAP
+          key: vmp.vms.flow.send.count
+          delay: '0'
+        -
+          uuid: 7b61f2c64a35434b93af2149f85bd893
+          name: 'all vm network send packgage count'
+          type: TRAP
+          key: vmp.vms.flow.send.package.count
+          delay: '0'
       discovery_rules:
         -
           uuid: 9280729402424eed9a0c7c3dbfeda889
@@ -282,6 +331,12 @@ zabbix_export:
           delay: '0'
           trends: '0'
           value_type: CHAR
+          triggers:
+            -
+              uuid: 5cefe1b24b0c431b94b184a4367a9c2f
+              expression: 'last(/VMP Disk/status)<>"NORMAL"'
+              name: '{HOST.HOST} Disk Status Change Not NORMAL'
+              priority: DISASTER
         -
           uuid: f8388fa50fa14a918ab0b6c8a5f76db9
           name: storage_type
@@ -508,7 +563,7 @@ zabbix_export:
           triggers:
             -
               uuid: dd38e6bc021544028a24db8675baa04a
-              expression: 'avg(/VMP VM/cpu_ratio,2h) * 100 > 80'
+              expression: 'avg(/VMP VM/cpu_ratio,1h) * 100 > 80'
               name: '{HOST.HOST} CPU Load Abnormal'
               priority: AVERAGE
         -
@@ -517,24 +572,44 @@ zabbix_export:
           type: TRAP
           key: disk_info_iops_read
           delay: '0'
+          triggers:
+            -
+              uuid: b6790181722c47adae264db00935d2ed
+              expression: 'avg(/VMP VM/disk_info_iops_read,10m) > 800'
+              name: 'disk iops read err'
         -
           uuid: 4173e7226e8b4b03879bf2097a74a14c
           name: disk_info_iops_write
           type: TRAP
           key: disk_info_iops_write
           delay: '0'
+          triggers:
+            -
+              uuid: f2e62398ef73413084c5831b9f702a08
+              expression: 'avg(/VMP VM/disk_info_iops_write,10m) > 300'
+              name: 'disk iops write err'
         -
           uuid: 59a29cae49bb40b1b5eb10eb80f2f888
           name: disk_info_speed_read
           type: TRAP
           key: disk_info_speed_read
           delay: '0'
+          triggers:
+            -
+              uuid: b31437297eec43cfaa15ac3c9e471496
+              expression: 'avg(/VMP VM/disk_info_speed_read,10m) > 20000000'
+              name: 'disk speed read err'
         -
           uuid: 056a4b03c4344049b2f221096bccbec8
           name: disk_info_speed_write
           type: TRAP
           key: disk_info_speed_write
           delay: '0'
+          triggers:
+            -
+              uuid: f2efa31b69894cba95b1435369ddb264
+              expression: 'avg(/VMP VM/disk_info_speed_write,10m) > 20000000'
+              name: 'disk speed write err'
         -
           uuid: 70c7237ea4f84c94997f4e587225f171
           name: disk_status_free
@@ -566,6 +641,11 @@ zabbix_export:
           type: TRAP
           key: flow_info_receive
           delay: '0'
+          triggers:
+            -
+              uuid: 30f4a10667ca4e558d593d28e262629f
+              expression: 'avg(/VMP VM/flow_info_receive,10m) > 20000000'
+              name: 'network receive err'
         -
           uuid: a023c4cb541c431aa2619051a040535d
           name: flow_info_receive_package
@@ -578,6 +658,11 @@ zabbix_export:
           type: TRAP
           key: flow_info_send
           delay: '0'
+          triggers:
+            -
+              uuid: 3f2265d34ce64f64893d8513c66a1297
+              expression: 'avg(/VMP VM/flow_info_send,10m) > 20000000'
+              name: 'network send err'
         -
           uuid: c2d3efaf7e864c579a1854ed1f4f2e70
           name: flow_info_send_package
@@ -594,8 +679,8 @@ zabbix_export:
           triggers:
             -
               uuid: 6a92d43490b34c1c92d02de902f65cf9
-              expression: 'avg(/VMP VM/io_ratio,1h) * 100 > 80'
-              name: '{HOST.HOST} IO usage exceeds 80% 1h Abnormal'
+              expression: 'avg(/VMP VM/io_ratio,30m) * 100 > 80'
+              name: '{HOST.HOST} IO usage exceeds 80% Abnormal'
               priority: HIGH
         -
           uuid: 9070815ce93945c1b5571864c79f1831
@@ -634,7 +719,7 @@ zabbix_export:
           triggers:
             -
               uuid: 82327aaa396043e39492720ed5021dbe
-              expression: 'last(/VMP VM/mem_status_ratio)* 100>80'
+              expression: 'avg(/VMP VM/mem_status_ratio, 30m)* 100>80'
               name: '{HOST.HOST} Memory usage exceeds 80%'
               priority: WARNING
         -
@@ -686,3 +771,148 @@ zabbix_export:
       expression: 'last(/VMP Storage/used)/ last(/VMP Storage/total) *100 > 80'
       name: '{HOST.HOST} Storage usage exceeds 80%'
       priority: AVERAGE
+  graphs:
+    -
+      uuid: 74cc8ed71fee4feba515cc40d27ce29c
+      name: 'disk iops'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'VMP VM'
+            key: disk_info_iops_read
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'VMP VM'
+            key: disk_info_iops_write
+    -
+      uuid: ad26a7bd4fef4abeb7f8d413512203c4
+      name: 'disk speed'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'VMP Storage'
+            key: read_ratio
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'VMP Storage'
+            key: write_ratio
+    -
+      uuid: 217ee5ce9bb04cbd9a61c65ffe0ebdb4
+      name: 'disk speed'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'VMP VM'
+            key: disk_info_speed_read
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'VMP VM'
+            key: disk_info_speed_write
+    -
+      uuid: bafc0df921aa4197968b7218aa4d0fb2
+      name: 'network info'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'VMP VM'
+            key: flow_info_receive
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'VMP VM'
+            key: flow_info_send
+    -
+      uuid: 114d5abbdf634818abb5ae6cf8829941
+      name: 'network package'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'VMP VM'
+            key: flow_info_receive_package
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'VMP VM'
+            key: flow_info_send_package
+    -
+      uuid: 93afafb76ff84af9b94501b678b901c4
+      name: 'vms disk iops'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'VMP Dir'
+            key: vmp.vms.disk.iops.read.count
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'VMP Dir'
+            key: vmp.vms.disk.iops.write.count
+    -
+      uuid: 411d314a120341caa0ea0ac197b1a20e
+      name: 'vms disk speed'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'VMP Dir'
+            key: vmp.vms.disk.speed.read.count
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'VMP Dir'
+            key: vmp.vms.disk.speed.write.count
+    -
+      uuid: 28db393c4db44ad1983d7b1e95fa5b05
+      name: 'vms network'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'VMP Dir'
+            key: vmp.vms.flow.receive.count
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'VMP Dir'
+            key: vmp.vms.flow.send.count
+    -
+      uuid: 1b419f19047a4ca08de6af7a9946dee4
+      name: 'vms network package'
+      graph_items:
+        -
+          sortorder: '1'
+          color: 1A7C11
+          item:
+            host: 'VMP Dir'
+            key: vmp.vms.flow.receive.package.count
+        -
+          sortorder: '2'
+          color: F63100
+          item:
+            host: 'VMP Dir'
+            key: vmp.vms.flow.send.package.count
