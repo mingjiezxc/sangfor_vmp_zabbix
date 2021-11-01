@@ -20,7 +20,7 @@ var (
 	disksUrl      = "https://10.0.251.40/vapi/json/vs/vs_config/get_all_disks"
 	vmLogUrl      = "https://10.0.251.40/vapi/extjs/log/all?start=0&limit=1&vmid="
 	vmpUser       = "zabbix"
-	vmpPassword   = "255d247d27d5896dd4df5990747c1eb519c05dcc9231c2eb9746633fd572a5056925773fee451a65620f754810f8a1aaef5879d3ec78118738dba31098c706945f729deb410f1fbf521222e513e7c393477a3dfadd814c09dd726d4b332cc4d2f6d270ee2f856e5f55ffc4405b35c9ff63769fd230b5cee520c3b78c7b1de7c99319e8c353b10464b043999b9622aa29a2c60534ec1536dc02c1c15c3764fc8141418e04b966904d53a4c35b9905b58d037ab2cdeafbccdab44edee5cdde3d0d1b86b171287d29aeaa35a0f59243a5fdea369be44adb251204fd94759d1001d9da8591adc27c1051bfb803e9d8fe183e54d6f24102d3e5e0d33431e1fa941a60"
+	vmpPassword   = ""
 	loginUsername = ""
 	loginTicket   = ""
 	zabbixHost    = "10.0.28.230"
